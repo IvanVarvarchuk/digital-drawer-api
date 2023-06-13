@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.5.2" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.5.2" />
+    <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" Version="7.1.4" />
+    <PackageReference Include="MediatR" Version="12.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.5" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Features\ApiKey\Commands\CreateApiKeyCommand\" />
+    <Folder Include="Features\ApiKey\Commands\RevokeApiKeyCommand\" />
+    <Folder Include="Features\ApiKey\Queries\GetApiKeysQuery\" />
+    <Folder Include="Features\Conversion\Commands\ConversionSoftDeleteCommand\" />
+    <Folder Include="Features\Conversion\Commands\ConversionHardDeleteCommand\" />
+    <Folder Include="Features\Conversion\Queries\GetConversionsWithPaginationsQuery\" />
+    <Folder Include="Features\Conversion\Queries\GetConversionsQuery\" />
+    <Folder Include="Features\Conversion\Queries\GetConversionFileQuery\" />
+    <Folder Include="Features\Profile\Commands\UpdateProfileInfoCommand\" />
+    <Folder Include="Features\Profile\Queries\GetProfileInfoQuery\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DigitalDrawer.Domain\DigitalDrawer.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
