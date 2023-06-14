@@ -89,7 +89,7 @@ public class IdentityService : IIdentityService
     }
     public async Task<bool> ValidateUser(LoginUserViewModel userModel)
     {
-        var user = await _userManager.FindByNameAsync(userModel.Email);
+        var user = await _userManager.FindByEmailAsync(userModel.Email);
         bool ok = (user != null) && (await _userManager.CheckPasswordAsync(user, userModel.Password));
         return ok;
     }
@@ -97,7 +97,10 @@ public class IdentityService : IIdentityService
     public async Task<User> FindUserByEmail(string email)
     {
         var user = await _userManager.FindByEmailAsync(email);
-
+        if (user == null)
+        {
+            return null;
+        }
         var resultUser = new User()
         {
             Id = user.Id,

@@ -1,4 +1,5 @@
 ﻿using DigitalDrawer.Application.Common.Interfaces;
+using DigitalDrawer.Domain.Entities;
 using DigitalDrawer.Infrastructure.Common;
 using DigitalDrawer.Infrastructure.Identity;
 using DigitalDrawer.Infrastructure.Persistance.Interseptors;
@@ -32,6 +33,7 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
         _auditableEntitySaveChangesInterceptor = auditableEntitySaveChangesInterceptor;
     }
     
+    public DbSet<FileConversion> FileConversions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

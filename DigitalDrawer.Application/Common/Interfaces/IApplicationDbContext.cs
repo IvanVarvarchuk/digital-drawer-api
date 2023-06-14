@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DigitalDrawer.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
-namespace DigitalDrawer.Application.Common.Interfaces
+namespace DigitalDrawer.Application.Common.Interfaces;
+
+public interface IApplicationDbContext
 {
-    public interface IApplicationDbContext
-    {
-    }
+    public DbSet<FileConversion> FileConversions { get; set; }
+    
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+
 }

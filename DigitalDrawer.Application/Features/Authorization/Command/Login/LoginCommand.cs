@@ -33,11 +33,11 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthenticationR
             Email = request.Email,
             Password = request.Password
         });
-        var user = await _identityService.FindUserByEmail(request.Email);
-        if (!result)
+        if (result)
         { 
-            return null;
+            var user = await _identityService.FindUserByEmail(request.Email);
+            return await _accesTokenService.CreateToken(user);
         }
-        return await _accesTokenService.CreateToken(user);
+        return null;
     }
 }
