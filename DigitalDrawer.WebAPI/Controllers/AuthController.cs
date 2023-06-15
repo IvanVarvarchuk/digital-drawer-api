@@ -27,6 +27,12 @@ namespace DigitalDrawer.WebAPI.Controllers
         [Route("[action]")]
         public async Task<ActionResult> Register([FromBody] RegisterCommand command)
         {
+            var result = await Mediator.Send(command); 
+            if (result.Errors.Length > 0)
+            {
+                return BadRequest(result);
+            }
+
             return Created("", await Mediator.Send(command));
         }
     }

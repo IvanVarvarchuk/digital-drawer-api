@@ -31,7 +31,10 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Authentic
         var (result, user) = await _identityService.CreateUserAsync(request);
         if (!result.Succeeded)
         {
-            return null;
+            return new AuthenticationResponse()
+            {
+                Errors = result.Errors,
+            };
         }
         return await _accesTokenService.CreateToken(user);
     }
