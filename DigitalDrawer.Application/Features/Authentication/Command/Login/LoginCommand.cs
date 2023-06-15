@@ -1,10 +1,9 @@
 ﻿using DigitalDrawer.Application.Common.Interfaces;
-using DigitalDrawer.Infrastructure.Identity;
 using MediatR;
 using System.ComponentModel.Design;
 using System.Reflection.Metadata.Ecma335;
 
-namespace DigitalDrawer.Application.Features.Authorization.Command.Login;
+namespace DigitalDrawer.Application.Features.Authentication.Command.Login;
 
 public record LoginCommand : IRequest<AuthenticationResponse?>
 {
@@ -18,7 +17,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthenticationR
     private readonly IAccesTokenService _accesTokenService;
 
     public LoginCommandHandler(
-        IIdentityService identityService, 
+        IIdentityService identityService,
         IAccesTokenService accesTokenService)
     {
         _identityService = identityService;
@@ -34,7 +33,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthenticationR
             Password = request.Password
         });
         if (result)
-        { 
+        {
             var user = await _identityService.FindUserByEmail(request.Email);
             return await _accesTokenService.CreateToken(user);
         }

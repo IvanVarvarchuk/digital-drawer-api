@@ -1,6 +1,5 @@
 ﻿using DigitalDrawer.Application.Common.Interfaces;
 using DigitalDrawer.Application.Common.Models;
-using DigitalDrawer.Infrastructure.Identity;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -8,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DigitalDrawer.Application.Features.Authorization.Command.Register;
+namespace DigitalDrawer.Application.Features.Authentication.Command.Register;
 
 public class RegisterCommand : RegisterUserModel, IRequest<AuthenticationResponse?> { }
 

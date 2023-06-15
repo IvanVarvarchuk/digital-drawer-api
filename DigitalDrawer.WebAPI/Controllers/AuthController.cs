@@ -1,5 +1,5 @@
-﻿using DigitalDrawer.Application.Features.Authorization.Command.Login;
-using DigitalDrawer.Application.Features.Authorization.Command.Register;
+﻿using DigitalDrawer.Application.Features.Authentication.Command.Login;
+using DigitalDrawer.Application.Features.Authentication.Command.Register;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +9,7 @@ namespace DigitalDrawer.WebAPI.Controllers
     public class AuthController : ApiControllerBase
     {
         [HttpPost]
+        [Route("[action]")]
         public async Task<ActionResult> Login([FromBody] LoginCommand command)
         {
             if (!ModelState.IsValid)

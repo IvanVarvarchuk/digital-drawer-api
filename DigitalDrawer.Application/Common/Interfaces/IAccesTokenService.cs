@@ -1,7 +1,6 @@
-﻿
-using DigitalDrawer.Application.Common.Models;
+﻿using DigitalDrawer.Application.Common.Models;
 
-namespace DigitalDrawer.Infrastructure.Identity;
+namespace DigitalDrawer.Application.Common.Interfaces;
 
 public record AuthenticationResponse
 {
