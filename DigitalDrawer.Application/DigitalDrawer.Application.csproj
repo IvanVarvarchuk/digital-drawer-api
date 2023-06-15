@@ -17,9 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\ApiKey\Commands\CreateApiKeyCommand\" />
-    <Folder Include="Features\ApiKey\Commands\RevokeApiKeyCommand\" />
-    <Folder Include="Features\ApiKey\Queries\GetApiKeysQuery\" />
     <Folder Include="Features\Profile\Commands\UpdateProfileInfoCommand\" />
     <Folder Include="Features\Profile\Queries\GetProfileInfoQuery\" />
   </ItemGroup>

@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using DigitalDrawer.Application.Common.Interfaces;
+using DigitalDrawer.WebAPI.Auth.ApiKey;
+using DigitalDrawer.WebAPI.Auth.JWT;
+using DigitalDrawer.WebAPI.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -33,6 +37,9 @@ namespace DigitalDrawer.WebAPI
         }
         public static IServiceCollection AddPresentation(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddScoped<ApiKeyAuthorizationFilter>();
+            services.AddScoped<IApiKeyValidator, ApiKeyValidator>();
+            services.AddSingleton<IJwtAuthorizationService, JwtAuthorizationService>();
             services.ConfigureJWT(configuration);
             services.ConfigureApplicationCookie(options =>
             {
@@ -48,14 +55,45 @@ namespace DigitalDrawer.WebAPI
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
                 {
                     Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey,
+                    Type = SecuritySchemeType.Http,
                     Scheme = "Bearer",
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header,
                     Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 1safsfsdfdfd\"",
                 });
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement {
-                    {new OpenApiSecurityScheme { Reference = new OpenApiReference {Type = ReferenceType.SecurityScheme, Id = "Bearer" }},new string[] {}}});
+                c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme()
+                {
+                    Scheme = "ApiKey",
+                    In = ParameterLocation.Header,
+                    Name = "X-API-KEY", //header with api key
+                    Type = SecuritySchemeType.ApiKey,
+                });
+                
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    },
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "ApiKey"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
             });
             return services;
         }

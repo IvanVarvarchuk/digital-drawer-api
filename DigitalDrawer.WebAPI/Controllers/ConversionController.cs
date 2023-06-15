@@ -9,12 +9,12 @@ using System.IO;
 
 namespace DigitalDrawer.WebAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     public class ConversionController : ApiControllerBase
     {
         const string CONTENT_TYPE= "application/octet-stream";
         [HttpPost]
-        [Authorize]
         public async Task<ActionResult> CreateConvertion([FromBody] CreateConversionCommand command)
         {
             var response = await Mediator.Send(command);

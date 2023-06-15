@@ -35,6 +35,8 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
     
     public DbSet<FileConversion> FileConversions { get; set; }
 
+    public DbSet<UsersApiKey> ApiKeys { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

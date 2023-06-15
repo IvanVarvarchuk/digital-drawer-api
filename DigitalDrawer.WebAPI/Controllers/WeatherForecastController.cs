@@ -1,3 +1,4 @@
+using DigitalDrawer.WebAPI.Auth.ApiKey;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +19,7 @@ namespace DigitalDrawer.WebAPI.Controllers
         {
             _logger = logger;
         }
-        [Authorize]
+        [ApiKey]
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
