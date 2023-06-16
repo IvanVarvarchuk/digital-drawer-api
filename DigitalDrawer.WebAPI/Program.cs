@@ -3,6 +3,7 @@ using DigitalDrawer.Application.Common.Interfaces;
 using DigitalDrawer.Infrastructure;
 using DigitalDrawer.WebAPI;
 using DigitalDrawer.WebAPI.Services;
+using Hangfire;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +32,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseIdentityServer();
 app.UseAuthorization();
+app.UseHangfireDashboard();
 
 app.UseCors(x => x
     .AllowAnyMethod()

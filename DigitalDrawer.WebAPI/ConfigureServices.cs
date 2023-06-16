@@ -2,6 +2,8 @@
 using DigitalDrawer.WebAPI.Auth.ApiKey;
 using DigitalDrawer.WebAPI.Auth.JWT;
 using DigitalDrawer.WebAPI.Services;
+using Hangfire;
+using Hangfire.MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -41,6 +43,11 @@ namespace DigitalDrawer.WebAPI
             services.AddScoped<IApiKeyValidator, ApiKeyValidator>();
             services.AddSingleton<IJwtAuthorizationService, JwtAuthorizationService>();
             services.ConfigureJWT(configuration);
+            services.AddHangfire(c =>
+            {
+                c.UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection"));
+                c.UseMediatR();
+            });
             services.ConfigureApplicationCookie(options =>
             {
                 // Cookie settings
