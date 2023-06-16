@@ -12,19 +12,23 @@ namespace DigitalDrawer.WebAPI.Controllers
     public class ApiKeyController : ApiControllerBase
     {
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult> CreateApiKey([FromBody] CreateApiKeyCommand command, CancellationToken cancellationToken)
         {
-            return Ok(await Mediator.Send(command, cancellationToken));
+            var apiKey = await Mediator.Send(command, cancellationToken);
+            return CreatedAtAction(nameof(GetApiKeyById), new { id = apiKey.Id }, apiKey);
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetConvertion([FromRoute] GetApiKeysQuery request)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetApiKeys()
         {
-            return Ok(await Mediator.Send(request));
+            return Ok(await Mediator.Send(new GetApiKeysQuery()));
         }
 
         [HttpDelete("[action]/{id}")]
-        public async Task<ActionResult> GetConvertions([FromRoute] Guid id, CancellationToken cancellationToken)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetApiKeyById([FromRoute] Guid id, CancellationToken cancellationToken)
         {
             return Ok(await Mediator.Send(new RevokeApiKeyCommand(){ Id = id }, cancellationToken));
         }

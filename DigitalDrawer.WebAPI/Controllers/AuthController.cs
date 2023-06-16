@@ -10,6 +10,9 @@ namespace DigitalDrawer.WebAPI.Controllers
     {
         [HttpPost]
         [Route("[action]")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> Login([FromBody] LoginCommand command)
         {
             if (!ModelState.IsValid)
@@ -23,8 +26,11 @@ namespace DigitalDrawer.WebAPI.Controllers
             }
             return Accepted(result);
         }
+
         [HttpPost]
         [Route("[action]")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult> Register([FromBody] RegisterCommand command)
         {
             var result = await Mediator.Send(command); 

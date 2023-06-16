@@ -23,15 +23,27 @@ namespace DigitalDrawer.WebAPI.Controllers
         private Action<string> cleanup = (string jobId) => _ = BackgroundJob.Delete(jobId);
         
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> CreateConvertion([FromBody] CreateConversionCommand command)
         {
-            var response = await Mediator.Send(command);
-            return File(response.ConvertedFileContent, CONTENT_TYPE, response.FileName);
+            try
+            {
 
+                var response = await Mediator.Send(command);
+                return File(response.ConvertedFileContent, CONTENT_TYPE, response.FileName);
+
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
             //return Ok(await Mediator.Send(command));
         }
 
         [HttpGet("[action]/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> GetConvertion([FromRoute] Guid id)
         {
             try
@@ -41,17 +53,21 @@ namespace DigitalDrawer.WebAPI.Controllers
             }
             catch (NotFoundException ex)
             {
-                return BadRequest(ex.Message);
+                return NotFound(ex.Message);
             }
         }
 
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> GetConvertions([FromQuery] GetConversionsQuery query)
         {
             return Ok(await Mediator.Send(query));
         }
 
         [HttpDelete("[action]/{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> MoveToDeleted([FromRoute] Guid id)
         {
             try
@@ -67,11 +83,13 @@ namespace DigitalDrawer.WebAPI.Controllers
             }
             catch (NotFoundException ex)
             {
-                return BadRequest(ex.Message);
+                return NotFound(ex.Message);
             }
         }
         
         [HttpDelete("[action]/{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> HardDelete([FromRoute] Guid id)
         {
             try
@@ -81,11 +99,13 @@ namespace DigitalDrawer.WebAPI.Controllers
             }
             catch (NotFoundException ex)
             {
-                return BadRequest(ex.Message);
+                return NotFound(ex.Message);
             }
             
         }
         [HttpPatch("[action]/{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> CancelDelete([FromRoute] Guid id)
         {
             try
@@ -95,7 +115,7 @@ namespace DigitalDrawer.WebAPI.Controllers
             }
             catch (NotFoundException ex)
             {
-                return BadRequest(ex.Message);
+                return NotFound(ex.Message);
             }
         }
 
