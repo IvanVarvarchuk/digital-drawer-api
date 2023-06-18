@@ -33,14 +33,15 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, 
         _auditableEntitySaveChangesInterceptor = auditableEntitySaveChangesInterceptor;
     }
     
-    public DbSet<FileConversion> FileConversions { get; set; }
+    public DbSet<ConversionTask> ConversionTasks { get; set; }
+
+    public DbSet<ConversionFile> FileConversions { get; set; }
 
     public DbSet<UsersApiKey> ApiKeys { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-
         base.OnModelCreating(builder);
     }
 

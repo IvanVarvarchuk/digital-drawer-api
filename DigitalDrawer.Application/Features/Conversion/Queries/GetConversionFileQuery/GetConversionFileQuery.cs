@@ -30,7 +30,7 @@ public class GetConversionFileHandler : IRequestHandler<GetConversionFileQuery, 
         var conversion = await _context.FileConversions.FirstOrDefaultAsync(x => x.Id == request.Id);
         if (conversion == null)
         {
-            throw new NotFoundException(nameof(FileConversion), request.Id);
+            throw new NotFoundException(nameof(ConversionFile), request.Id);
         }
         var memoryStream = new MemoryStream(conversion.ConvertedFileContent);
             

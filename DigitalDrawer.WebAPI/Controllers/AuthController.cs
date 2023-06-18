@@ -1,5 +1,6 @@
 ﻿using DigitalDrawer.Application.Features.Authentication.Command.Login;
 using DigitalDrawer.Application.Features.Authentication.Command.Register;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,16 +16,19 @@ namespace DigitalDrawer.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> Login([FromBody] LoginCommand command)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                var result = await Mediator.Send(command);
+                if (result == null)
+                {
+                    return Unauthorized();
+                }
+                return Accepted(result);
             }
-            var result = await Mediator.Send(command);
-            if (result == null)
+            catch (ValidationException ex)
             {
-                return Unauthorized();
+                return BadRequest(ex.Errors);
             }
-            return Accepted(result);
         }
 
         [HttpPost]
@@ -33,13 +37,20 @@ namespace DigitalDrawer.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult> Register([FromBody] RegisterCommand command)
         {
-            var result = await Mediator.Send(command); 
-            if (result.Errors.Length > 0)
+            try
             {
-                return BadRequest(result);
-            }
+                var result = await Mediator.Send(command);
+                if (result.Errors?.Length > 0)
+                {
+                    return BadRequest(result);
+                }
 
-            return Created("", await Mediator.Send(command));
+                return Created("", await Mediator.Send(command));
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Errors);
+            }
         }
     }
 }

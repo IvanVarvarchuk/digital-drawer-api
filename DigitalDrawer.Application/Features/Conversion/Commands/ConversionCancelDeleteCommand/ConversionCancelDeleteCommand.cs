@@ -26,7 +26,7 @@ namespace DigitalDrawer.Application.Features.Conversion.Commands.ConversionCance
             var conversion = await _context.FileConversions.SingleOrDefaultAsync(x => x.Id == request.Id);
             if (conversion == null)
             {
-                throw new NotFoundException(nameof(FileConversion), request.Id);
+                throw new NotFoundException(nameof(ConversionFile), request.Id);
             }
             conversion.DeletionDate = null;
             conversion.DeletionJobId = null;

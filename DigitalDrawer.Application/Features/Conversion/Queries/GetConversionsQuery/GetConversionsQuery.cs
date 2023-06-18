@@ -23,7 +23,7 @@ public class GetConversionsQuery : IRequest<IEnumerable<GetConversionQueryDto>>
 
 public class GetConversionQueryDto 
 {
-    public GetConversionQueryDto(FileConversion conversion)
+    public GetConversionQueryDto(ConversionFile conversion)
     {
         Id = conversion.Id;
         FileName = conversion.ConvertedFileName;

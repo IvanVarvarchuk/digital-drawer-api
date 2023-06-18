@@ -34,7 +34,7 @@ namespace DigitalDrawer.Application.Features.Conversion.Commands.CreateConversio
         {
             var bytes = Convert.FromBase64String(request.FileContent);
             var memoryStream = new MemoryStream(bytes);//Position 0;
-            _context.FileConversions.Add(new Domain.Entities.FileConversion()
+            _context.FileConversions.Add(new Domain.Entities.ConversionFile()
             {
                 UserId = _currentUserService.UserId,
                 OriginalFileName = request.FileName,
