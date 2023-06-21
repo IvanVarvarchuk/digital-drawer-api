@@ -1,5 +1,8 @@
 ﻿using DigitalDrawer.Application.Common.Interfaces;
+using DigitalDrawer.Domain.Enums;
+using DigitalDrawer.Infrastructure.DrawingConvertion;
 using DigitalDrawer.Infrastructure.Identity;
+using DigitalDrawer.Infrastructure.ImageProcessing;
 using DigitalDrawer.Infrastructure.Persistance;
 using DigitalDrawer.Infrastructure.Persistance.Interseptors;
 using DigitalDrawer.Infrastructure.Services;
@@ -53,7 +56,21 @@ public static class ConfigureServices
         services.AddTransient<IDateTime, DateTimeService>();
         services.AddTransient<IIdentityService, IdentityService>();
         services.AddTransient<IAccesTokenService, JwtService>();
-
+        services.AddTransient<DxfConvertionService>();
+        services.AddTransient<IfcConversionService>();
+        services.AddTransient<SvgConvertionService>();
+        services.AddTransient<IImageProcessingService, ImageProcessingService>();
+        _ = services.AddTransient<FileConversionServiceResolver>(serviceProvider => key =>
+        {
+            IFileConversionService? value = key switch
+            {
+                TargetFileFormat.DXF => serviceProvider.GetService<DxfConvertionService>(),
+                TargetFileFormat.IFC => serviceProvider.GetService<IfcConversionService>(),
+                TargetFileFormat.SVG => serviceProvider.GetService<SvgConvertionService>(),
+                _ => throw new KeyNotFoundException(), // or maybe return null, up to you
+            };
+            return value!;
+        });
         return services;
     }
 }

@@ -1,17 +1,23 @@
 ﻿using DigitalDrawer.Application.Common.Exeptions;
+using DigitalDrawer.Application.Features.ApiKey.Commands.CreateApiKeyCommand;
 using DigitalDrawer.Application.Features.Conversion.Commands.ConversionCancelDeleteCommand;
 using DigitalDrawer.Application.Features.Conversion.Commands.ConversionHardDeleteCommand;
 using DigitalDrawer.Application.Features.Conversion.Commands.ConversionSoftDeleteCommand;
 using DigitalDrawer.Application.Features.Conversion.Commands.CreateConversionCommand;
+using DigitalDrawer.Application.Features.Conversion.Commands.CreateConversionTaskCommand;
 using DigitalDrawer.Application.Features.Conversion.Queries.GetConversionFileQuery;
 using DigitalDrawer.Application.Features.Conversion.Queries.GetConversionsQuery;
+using DigitalDrawer.Application.Features.Conversion.Queries.GetConversionsResultsQuery;
 using Hangfire;
 using Hangfire.MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.IO;
+using System.IO.Pipes;
+using System.Net;
 
 namespace DigitalDrawer.WebAPI.Controllers
 {
@@ -25,31 +31,43 @@ namespace DigitalDrawer.WebAPI.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> CreateConvertion([FromBody] CreateConversionCommand command)
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(Guid))]
+        public async Task<ActionResult> CreateConvertionTask([FromBody] IEnumerable<CreateConversionCommand> commands)
         {
             try
             {
-
-                var response = await Mediator.Send(command);
-                return File(response.ConvertedFileContent, CONTENT_TYPE, response.FileName);
-
+                Guid taskId = await Mediator.Send(new CreateConversionTaskCommand());
+                foreach (var command in commands)
+                {
+                    command.ConvertionTaskId = taskId;
+                    Mediator.Enqueue($"File convertion task {taskId}", command);
+                }
+                return CreatedAtAction(nameof(GetConvertionsByTaskId), new { id = taskId }, taskId);
             }
             catch (NotFoundException ex)
             {
                 return NotFound(ex.Message);
             }
-            //return Ok(await Mediator.Send(command));
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("[action]/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> GetConvertion([FromRoute] Guid id)
+        [SwaggerResponse(StatusCodes.Status200OK, "File", typeof(FileResult))]
+        public async Task<ActionResult> Download([FromRoute] Guid id)
         {
             try
             {
                 var response = await Mediator.Send(new GetConversionFileQuery() { Id = id });
-                return File(response.ConvertedFileContent, CONTENT_TYPE, response.ConvertedFileName);
+                //return File(response.ConvertedFileContent, CONTENT_TYPE, response.ConvertedFileName);
+                return new FileStreamResult(response.ConvertedFileContent, CONTENT_TYPE)
+                {
+                    FileDownloadName = response.ConvertedFileName
+                };
             }
             catch (NotFoundException ex)
             {
@@ -57,9 +75,19 @@ namespace DigitalDrawer.WebAPI.Controllers
             }
         }
 
+        [HttpGet("ConvertionResults/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(IEnumerable<GetConversionQueryDto>))]
+        public async Task<ActionResult> GetConvertionsByTaskId([FromRoute] Guid id)
+        {
+            return Ok(await Mediator.Send(new GetConversionResultsQuery() { ConvertionTaskId = id }));
+        }
+        
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(IEnumerable<GetConversionQueryDto>))]
         public async Task<ActionResult> GetConvertions([FromQuery] GetConversionsQuery query)
         {
             return Ok(await Mediator.Send(query));
@@ -68,7 +96,7 @@ namespace DigitalDrawer.WebAPI.Controllers
         [HttpDelete("[action]/{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> MoveToDeleted([FromRoute] Guid id)
+        public async Task<ActionResult> SoftDelete([FromRoute] Guid id)
         {
             try
             {
@@ -111,7 +139,7 @@ namespace DigitalDrawer.WebAPI.Controllers
             try
             {
                 await Mediator.Send(new ConversionCancelDeleteCommand() { Id = id, CleanUp = cleanup });
-                return Ok();
+                return NoContent();
             }
             catch (NotFoundException ex)
             {

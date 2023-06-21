@@ -13,8 +13,15 @@ public interface IIdentityService
     Task<bool> ValidateUser(LoginUserViewModel userModel);
 
     Task<User> FindUserByEmail(string email);
+    
+    Task<User> FindUserById(string id);
 
     Task<(Result Result, User User)> CreateUserAsync(RegisterUserModel model);
 
     Task<Result> DeleteUserAsync(string userId);
+
+    Task UpdateEmailByUserId(UpdateProfileInfoViewModel model, string id);
+
+    Task UpdatePasswordByUserId(string currentPassword, string newPassword, string id);
+
 }

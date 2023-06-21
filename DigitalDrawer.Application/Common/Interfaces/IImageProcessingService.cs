@@ -4,5 +4,5 @@ namespace DigitalDrawer.Application.Common.Interfaces;
 
 public interface IImageProcessingService
 {
-    Task<Line[]> ExtractLines(Stream imageStream);
+    IEnumerable<Line> ExtractGeometry(Stream imageStream);
 }

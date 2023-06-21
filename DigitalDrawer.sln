@@ -34,7 +34,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OutOfProcessExecution", "Ou
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hangfire.MediatR", "Hangfire.MediatR\Hangfire.MediatR.csproj", "{15CEC649-54DA-4CD9-9E90-EE3F3163CCB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalDerawer.Application.UnitTests", "DigitalDerawer.Application.UnitTests\DigitalDerawer.Application.UnitTests.csproj", "{961E9105-CF8A-4D31-A76B-964125314912}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalDerawer.Application.UnitTests", "DigitalDerawer.Application.UnitTests\DigitalDerawer.Application.UnitTests.csproj", "{961E9105-CF8A-4D31-A76B-964125314912}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

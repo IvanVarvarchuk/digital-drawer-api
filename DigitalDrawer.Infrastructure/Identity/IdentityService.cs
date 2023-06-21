@@ -4,6 +4,7 @@ using DigitalDrawer.Application.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using static Duende.IdentityServer.Models.IdentityResources;
 
 namespace DigitalDrawer.Infrastructure.Identity;
 
@@ -97,6 +98,48 @@ public class IdentityService : IIdentityService
     public async Task<User> FindUserByEmail(string email)
     {
         var user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+        {
+            return null;
+        }
+        var resultUser = new User()
+        {
+            Id = user.Id,
+            UserName = user.UserName,
+            Email = user.Email
+        };
+
+        return resultUser;
+    }
+
+    public async Task UpdateEmailByUserId(UpdateProfileInfoViewModel model, string id)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+
+        if (!await _userManager.CheckPasswordAsync(user, model.CurrentPassword))
+        {
+            throw new Exception("Wrong password!");
+        }
+
+        await _userManager.SetEmailAsync(user, model.NewEmail);
+        //await _userManager.SetUserNameAsync(user, model.NewUserName);
+    }
+
+    public async Task UpdatePasswordByUserId(string currentPassword, string newPassword, string id)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+
+        var operationResult = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+
+        if (!operationResult.Succeeded)
+        {
+            throw new Exception("Wrong password!");
+        }
+    }
+
+    public async Task<User> FindUserById(string id)
+    {
+        var user = await _userManager.FindByIdAsync(id);
         if (user == null)
         {
             return null;
