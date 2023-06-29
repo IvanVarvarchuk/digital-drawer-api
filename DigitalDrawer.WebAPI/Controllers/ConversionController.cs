@@ -1,18 +1,21 @@
 ﻿using DigitalDrawer.Application.Common.Exeptions;
+using DigitalDrawer.Application.Common.Interfaces;
 using DigitalDrawer.Application.Features.ApiKey.Commands.CreateApiKeyCommand;
 using DigitalDrawer.Application.Features.Conversion.Commands.ConversionCancelDeleteCommand;
 using DigitalDrawer.Application.Features.Conversion.Commands.ConversionHardDeleteCommand;
 using DigitalDrawer.Application.Features.Conversion.Commands.ConversionSoftDeleteCommand;
-using DigitalDrawer.Application.Features.Conversion.Commands.CreateConversionCommand;
+using DigitalDrawer.Application.Features.Conversion.Commands.CreateConversionFileCommand;
 using DigitalDrawer.Application.Features.Conversion.Commands.CreateConversionTaskCommand;
 using DigitalDrawer.Application.Features.Conversion.Queries.GetConversionFileQuery;
 using DigitalDrawer.Application.Features.Conversion.Queries.GetConversionsQuery;
 using DigitalDrawer.Application.Features.Conversion.Queries.GetConversionsResultsQuery;
+using DigitalDrawer.WebAPI.Auth.ApiKey;
 using Hangfire;
 using Hangfire.MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OpenCvSharp;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.IO;
@@ -21,28 +24,45 @@ using System.Net;
 
 namespace DigitalDrawer.WebAPI.Controllers
 {
-    //[Authorize]
+    [ApiKey]
     [ApiController]
     public class ConversionController : ApiControllerBase
     {
         const string CONTENT_TYPE= "application/octet-stream";
+        const int MAX_UPLOAD_SIZE_200MB = 500 * 1024 * 1024;
         private Action<string> cleanup = (string jobId) => _ = BackgroundJob.Delete(jobId);
-        
+        private readonly ICurrentUserService _currentUserService;
+
+        public ConversionController(ICurrentUserService currentUserService)
+        {
+            _currentUserService = currentUserService;
+        }
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(Guid))]
-        public async Task<ActionResult> CreateConvertionTask([FromBody] IEnumerable<CreateConversionCommand> commands)
+        [RequestSizeLimit(MAX_UPLOAD_SIZE_200MB)]
+        public async Task<ActionResult> CreateConvertionTask([FromBody] IEnumerable<CreateConversionRequest> requests)
         {
             try
             {
                 Guid taskId = await Mediator.Send(new CreateConversionTaskCommand());
-                foreach (var command in commands)
+                foreach (var request in requests)
                 {
+                    var command = new CreateConversionCommand()
+                    {
+                        ConvertionTaskId = taskId,
+                        UserId = _currentUserService.UserId,
+                        FileContent = request.FileContent,
+                        FileName = request.FileName,
+                        ConvertedFileName = request.ConvertedFileName,
+                        FileTargetFormat = request.FileTargetFormat,
+                    };
                     command.ConvertionTaskId = taskId;
+                    command.UserId = _currentUserService.UserId!;
                     Mediator.Enqueue($"File convertion task {taskId}", command);
                 }
-                return CreatedAtAction(nameof(GetConvertionsByTaskId), new { id = taskId }, taskId);
+                return Ok(taskId);
             }
             catch (NotFoundException ex)
             {

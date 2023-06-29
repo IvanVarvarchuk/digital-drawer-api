@@ -20,7 +20,8 @@ namespace DigitalDrawer.WebAPI.Controllers
         public async Task<ActionResult> CreateApiKey([FromBody] CreateApiKeyCommand command, CancellationToken cancellationToken)
         {
             var apiKey = await Mediator.Send(command, cancellationToken);
-            return CreatedAtAction(nameof(GetApiKeys), apiKey);
+            return Ok(apiKey);
+            //return CreatedAtAction(nameof(GetApiKeys), apiKey);
         }
 
         [HttpGet]

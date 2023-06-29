@@ -48,6 +48,8 @@ namespace DigitalDrawer.WebAPI
                 c.UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection"));
                 c.UseMediatR();
             });
+            services.AddHangfireServer();
+
             services.ConfigureApplicationCookie(options =>
             {
                 // Cookie settings

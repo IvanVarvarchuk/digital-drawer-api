@@ -9,5 +9,5 @@ namespace DigitalDrawer.Application.Common.Interfaces;
 
 public interface IFileConversionService
 {
-    Stream Convert(IEnumerable<Line> lines);
+    byte[] Convert(IEnumerable<Line> lines);
 }

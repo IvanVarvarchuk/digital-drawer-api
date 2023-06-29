@@ -67,7 +67,7 @@ public static class ConfigureServices
                 TargetFileFormat.DXF => serviceProvider.GetService<DxfConvertionService>(),
                 TargetFileFormat.IFC => serviceProvider.GetService<IfcConversionService>(),
                 TargetFileFormat.SVG => serviceProvider.GetService<SvgConvertionService>(),
-                _ => throw new KeyNotFoundException(), // or maybe return null, up to you
+                _ => throw new KeyNotFoundException(),
             };
             return value!;
         });

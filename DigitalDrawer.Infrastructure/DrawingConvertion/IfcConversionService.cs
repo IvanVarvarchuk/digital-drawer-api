@@ -1,4 +1,5 @@
-﻿using DigitalDrawer.Application.Common.Interfaces;
+﻿using DigitalDrawer.Application.Common.Helpers;
+using DigitalDrawer.Application.Common.Interfaces;
 using DigitalDrawer.Application.Common.Models.Geometry;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace DigitalDrawer.Infrastructure.DrawingConvertion
     public class IfcConversionService : IFileConversionService
     {
         
-        public Stream Convert(IEnumerable<Line> lines)
+        public byte[] Convert(IEnumerable<Line> lines)
         {
             var ifcWriter = new IFCWriter();
             return ifcWriter.CreateIFCFile(FormatLines(lines));
@@ -34,17 +35,17 @@ namespace DigitalDrawer.Infrastructure.DrawingConvertion
 
     public class IFCWriter
     {
-        public Stream CreateIFCFile(IEnumerable<IfcLine> lines)
+        public byte[] CreateIFCFile(IEnumerable<IfcLine> lines)
         {
-            var memoryStream = new MemoryStream();
 
+            using var memoryStream = new MemoryStream();
+            using var writer = new StreamWriter(memoryStream);
             try
             {
-                using (var writer = new StreamWriter(memoryStream))
-                {
-                    WriteHeader(writer);
-                    WriteData(writer, lines);
-                }
+                
+                WriteHeader(writer);
+                WriteData(writer, lines);
+                memoryStream.Seek(0, SeekOrigin.Begin);
 
                 Console.WriteLine("IFC file created successfully!");
             }
@@ -53,8 +54,7 @@ namespace DigitalDrawer.Infrastructure.DrawingConvertion
                 Console.WriteLine("Error creating IFC file: " + ex.Message);
             }
 
-            memoryStream.Position = 0;
-            return memoryStream;
+            return memoryStream.ReadAllBytes();
         }
 
         private void WriteHeader(StreamWriter writer)
